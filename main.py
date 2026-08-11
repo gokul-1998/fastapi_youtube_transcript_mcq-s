@@ -12,18 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Dict
 from pydantic import BaseModel, Field
-
-try:
-    import google.genai as genai
-except ImportError:
-    import google.generativeai as genai
-    from google.generativeai.types import HarmCategory, HarmBlockThreshold
-else:
-    try:
-        from google.genai.types import HarmCategory, HarmBlockThreshold
-    except ImportError:
-        pass
-
+from openrouter import OpenRouter
 from dotenv import load_dotenv
 load_dotenv()  # Load environment variables from .env file
 
@@ -35,11 +24,12 @@ class TranscriptUnavailable(Exception):
 # --- Data Schemas for Gemini ---
 
 class Question(BaseModel):
-    type: str = Field(description="Must be one of: MCQ, MSQ, FILL_BLANK, FLASHCARD")
+    question_type: str = Field(description="Must be one of: mcq, multi_select, fill_blank, flashcard")
     question: str
-    options: List[str] = Field(description="List of strings, empty for FILL_BLANK/FLASHCARD")
-    correct_answer: str
+    options: List[str] = Field(description="List of option strings, empty list for fill_blank/flashcard")
+    correct_answers: List[str] = Field(description="List of correct answer strings. For mcq/fill_blank/flashcard use a single-element list. For multi_select use multiple elements.")
     explanation: str
+    tags: List[str] = Field(description="List of topic/category tags for this question, e.g. ['python', 'data types']")
 
 class QuizList(BaseModel):
     questions: List[Question]
@@ -139,58 +129,93 @@ def build_transcript_chunks(entries: List[Dict], batch_size_minutes: int = 5) ->
     return chunked
 
 
-async def generate_questions_for_chunk(model, chunk_text: str, start_min: int, end_min: int, q_per_min: int) -> List[Dict]:
-    """Generates questions for a 5-minute chunk using Gemini."""
+# Map from Gemini schema type names to desired CSV type names
+TYPE_MAP = {
+    "mcq": "mcq",
+    "multi_select": "multi_select",
+    "fill_blank": "fill_blank",
+    "flashcard": "flashcard",
+}
+
+
+def generate_questions_for_chunk(client, chunk_text: str, start_min: int, end_min: int, q_per_min: int) -> List[Dict]:
+    """Generates questions for a 5-minute chunk using Groq."""
     num_questions = q_per_min * max(1, end_min - start_min)
+    print(f"[{start_min}m-{end_min}m] Requesting {num_questions} questions from OpenRouter...")
 
     prompt = f"""
     You are an expert tutor. Create {num_questions} quiz questions based on this lecture segment ({start_min}m to {end_min}m).
-    Ensure a mix of MCQ, MSQ, FILL_BLANK, and FLASHCARD types.
+    Ensure a mix of question types: mcq, multi_select, fill_blank, and flashcard.
+
+    Rules:
+    - question_type must be one of: mcq, multi_select, fill_blank, flashcard
+    - For mcq: provide 3-5 options and exactly one correct answer
+    - For multi_select: provide 3-5 options and multiple correct answers
+    - For fill_blank: leave options as an empty list, provide the blank answer in correct_answers
+    - For flashcard: leave options as an empty list, provide the answer in correct_answers
+    - tags: provide 2-3 relevant topic/category tags per question
+
+    OUTPUT FORMAT: You MUST return a valid JSON object with a single key "questions" containing a list of objects matching the fields described above.
 
     Transcript:
     {chunk_text}
     """
 
     try:
-        result = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                response_mime_type="application/json",
-                response_schema=QuizList,
-            ),
+        response = client.chat.send(
+            model="nvidia/nemotron-3-super-120b-a12b:free",
+            messages=[
+              {
+                "role": "user",
+                "content": prompt
+              }
+            ]
         )
-        data = json.loads(result.text)
+        result_text = response.choices[0].message.content
+        
+        # Robust JSON extraction
+        start_idx = result_text.find('{')
+        end_idx = result_text.rfind('}')
+        if start_idx != -1 and end_idx != -1:
+            result_text = result_text[start_idx:end_idx+1]
+        
+        data = json.loads(result_text)
 
         rows = []
         for q in data.get("questions", []):
+            q_type = q.get("question_type", "mcq").lower()
+            q_type = TYPE_MAP.get(q_type, q_type)
             rows.append({
-                "minute_start": start_min,
-                "minute_end": end_min,
-                "type": q.get("type", "MCQ"),
                 "question": q.get("question", ""),
-                "options": " | ".join(q.get("options", [])),
-                "correct_answer": q.get("correct_answer", ""),
+                "question_type": q_type,
+                "options": "|".join(q.get("options", [])),
+                "correct_answers": "|".join(q.get("correct_answers", [])),
                 "explanation": q.get("explanation", ""),
+                "tags": "|".join(q.get("tags", [])),
             })
+        print(f"[{start_min}m-{end_min}m] Successfully parsed {len(rows)} questions.")
         return rows
     except Exception as e:
-        print(f"Error processing {start_min}-{end_min}: {e}", file=sys.stderr)
+        print(f"[{start_min}m-{end_min}m] Error: {e}", file=sys.stderr)
+        try:
+            print(f"[{start_min}m-{end_min}m] Raw response snippet: {result_text[:500]}", file=sys.stderr)
+        except Exception:
+            pass
         return []
 
 async def main():
-    parser = argparse.ArgumentParser(description="Efficient YouTube-to-Quiz via Gemini")
+    parser = argparse.ArgumentParser(description="Efficient YouTube-to-Quiz via OpenRouter")
     parser.add_argument("url")
-    parser.add_argument("--api-key", default=os.environ.get("GOOGLE_API_KEY"))
+    parser.add_argument("--api-key", default=os.environ.get("OPENROUTER_API_KEY"))
     parser.add_argument("--qpm", type=int, default=3, help="Questions per minute")
     parser.add_argument("--output", default="quiz.csv")
     parser.add_argument("--batch-minutes", type=int, default=5, help="Minutes per chunk")
     args = parser.parse_args()
 
     if not args.api_key:
-        print("Set GOOGLE_API_KEY environment variable."); sys.exit(1)
+        print("Set OPENROUTER_API_KEY environment variable."); sys.exit(1)
 
-    genai.configure(api_key=args.api_key)
-    model = genai.GenerativeModel("gemini-3.5-flash")
+    client = OpenRouter(api_key=args.api_key)
 
     print("Fetching transcript...")
     try:
@@ -214,8 +239,9 @@ async def main():
     tasks = []
     for chunk in chunks:
         tasks.append(
-            generate_questions_for_chunk(
-                model,
+            asyncio.to_thread(
+                generate_questions_for_chunk,
+                client,
                 chunk["text"],
                 chunk["start_min"],
                 chunk["end_min"],
@@ -234,7 +260,7 @@ async def main():
     with open(args.output, mode="w", newline="", encoding="utf-8") as csvfile:
         writer = csv.DictWriter(
             csvfile,
-            fieldnames=["minute_start", "minute_end", "type", "question", "options", "correct_answer", "explanation"],
+            fieldnames=["question", "question_type", "options", "correct_answers", "explanation", "tags"],
         )
         writer.writeheader()
         writer.writerows(all_rows)
