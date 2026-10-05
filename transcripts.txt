@@ -1,0 +1,630 @@
+[00:00:00] [Music]
+[00:00:08] [Music]
+[00:00:13] Hello and welcome to week four of this
+[00:00:15] uh course on machine learning
+[00:00:17] operations. So far we've looked at uh
+[00:00:20] versioning of data, versioning of
+[00:00:23] features and how the two are integrated
+[00:00:25] together in a way to cater to couple of
+[00:00:29] very important uh benefits that MLOps
+[00:00:33] provides. Uh in this week we will start
+[00:00:36] taking a look at the code itself and
+[00:00:39] what it means to package machine
+[00:00:41] learning code together with u the
+[00:00:44] appropriate artifacts including testing
+[00:00:46] including uh documentation such that the
+[00:00:50] entire exercise of versioning uh of code
+[00:00:54] model and the data itself go hand in
+[00:00:58] hand together. So more specifically,
+[00:01:00] we're going to take a look at what it
+[00:01:02] means to carry out CI/CD for machine
+[00:01:06] learning pipelines. So what is CI/CD? Uh
+[00:01:09] CI stands for continuous integration. Uh
+[00:01:12] CD stands for continuous delivery. So
+[00:01:14] why bother with CI/CD for machine
+[00:01:16] learning? First and foremost, the most
+[00:01:18] uh uh you know benefit comes from having
+[00:01:22] automation. We all know that right? We
+[00:01:24] have we have written software, we have
+[00:01:26] written programs. So we know that
+[00:01:27] automation provides in immense help but
+[00:01:30] the pipelines that are typically
+[00:01:34] uh run to create
+[00:01:36] um consistent reliable machine learning
+[00:01:40] model execution is not something that
+[00:01:43] was uh looked at in a way that uh
+[00:01:45] software was looked at. So if you look
+[00:01:48] at the origins of data science itself as
+[00:01:50] an activity, it was done by
+[00:01:52] non-programmers
+[00:01:54] uh people who didn't have a computer
+[00:01:56] science background who came in from
+[00:01:57] other backgrounds u like like a rich
+[00:02:00] diverse set of backgrounds like physics
+[00:02:03] and law and things like that and for
+[00:02:05] them to be able to get data science
+[00:02:07] models uh trained and uh outcomes
+[00:02:11] measured was quite of a bit of a
+[00:02:13] challenge. So
+[00:02:15] usually engineers were called upon to
+[00:02:17] help them out and that's how um like
+[00:02:20] everybody started to have their own
+[00:02:22] tools and techniques and data science
+[00:02:24] itself was fragmented as an exercise
+[00:02:26] between model training on the one hand
+[00:02:28] and what needed to happen in production
+[00:02:30] on the other hand. So CI/CD separately
+[00:02:35] had already evolved for software. Um
+[00:02:38] DevOps was the you know umbrella under
+[00:02:41] which this became very popular.
+[00:02:43] So uh it became logical for putting both
+[00:02:48] of these together and create u uh CI/CD
+[00:02:52] practices for machine learning as well.
+[00:02:54] So the automated pipelines that provide
+[00:02:57] reliability for software can now be
+[00:03:00] extended to provide uh reliable
+[00:03:03] automated machine learning pipelines.
+[00:03:05] And what's more the CD angle which is
+[00:03:09] basically the continuous delivery angle
+[00:03:11] allows allows us to take those models
+[00:03:15] machine learning models and make them
+[00:03:18] deployable in highly scalable
+[00:03:20] environments right so that you can scale
+[00:03:22] up to as much you know volume or
+[00:03:25] velocity that you need and scale down as
+[00:03:27] required. So in practice uh you would
+[00:03:30] find that the CI/CD pipelines that uh we
+[00:03:34] create for machine learning becomes the
+[00:03:36] vehicle on top of which all of the
+[00:03:38] different guarantees of MLOps gets
+[00:03:40] realized. Be it data versioning, be it
+[00:03:44] like model versioning, be it code
+[00:03:46] versioning. So that becomes the reason
+[00:03:50] why we have to think about and
+[00:03:52] understand what CI/CD truly does.
+[00:03:56] So what is CI? CI is basically
+[00:03:58] continuous integration. It deals with
+[00:04:00] the topic of how do I continuously
+[00:04:04] uh bring all the disperate pieces of
+[00:04:07] artifacts together when I'm building a
+[00:04:10] machine learning pipeline to
+[00:04:13] uh have one
+[00:04:16] coherent hole to that package. What I
+[00:04:20] mean by that is can I have the the test
+[00:04:25] data the code that's actually producing
+[00:04:28] the model the model artifact
+[00:04:30] itself always packaged together with
+[00:04:34] automation such that I know that the
+[00:04:37] model accuracy has not fallen off and
+[00:04:40] it's producing the right outputs
+[00:04:42] consistently. It's not regressing on an
+[00:04:45] output that it successfully produced the
+[00:04:47] last time around. it's not regressing on
+[00:04:49] that like for instance if I'm predicting
+[00:04:51] the class of iris flower that an image
+[00:04:55] belongs to um if I have 10 successful
+[00:05:00] model versions which I've been able to
+[00:05:01] predict that successfully it shouldn't
+[00:05:03] be that the 11th version now says that I
+[00:05:06] can't recognize this image so I don't
+[00:05:08] have an opinion that would be wrong uh
+[00:05:11] that would also you know uh defy
+[00:05:14] expectations so not to regress to
+[00:05:18] continuously have uh testing be part and
+[00:05:21] parcel of any model execution uh model
+[00:05:25] version that I'm developing a new um
+[00:05:28] packaging this together such that it's
+[00:05:29] all one artifact all of that is part and
+[00:05:31] parcel of CI CD on the other hand which
+[00:05:34] is continuous delivery or continuous
+[00:05:35] deployment it ensures that this package
+[00:05:38] that I've created that I've tested that
+[00:05:42] is good to go can be deployed in
+[00:05:45] production or deployed in staging first
+[00:05:46] most likely
+[00:05:47] because staging has its own checks and
+[00:05:50] balances and then deployed to
+[00:05:51] production. So deployed to environments
+[00:05:53] where this can run at whatever scale is
+[00:05:56] chosen could be small scale could be
+[00:05:58] larger scale and what's more the
+[00:06:02] environment in which it runs finally
+[00:06:04] allows for monitoring the continuous
+[00:06:06] performance of that particular model um
+[00:06:09] including the inferences etc and also if
+[00:06:13] required for us to be able to roll back
+[00:06:15] the version to the previous version that
+[00:06:17] was running successfully. So that also
+[00:06:20] is part and parcel of the CD uh set of
+[00:06:25] processes. So why CD for or why CI/CD
+[00:06:28] for the for for machine learning. First
+[00:06:31] and foremost is reproducibility and
+[00:06:32] consistency. We spoke about that. Then
+[00:06:35] comes the topic of how do I experiment
+[00:06:37] with models faster because ultimately
+[00:06:40] data science is about newer and newer
+[00:06:42] iterations of models. We've all seen
+[00:06:44] that cycle of data science and to be
+[00:06:47] able to have every single model
+[00:06:50] execution run like clockwork without
+[00:06:53] manually executing 15 steps and then
+[00:06:56] having to remember all those 15 steps by
+[00:06:58] heart etc etc. Uh that's a critical
+[00:07:01] aspect of how quickly we can iterate and
+[00:07:04] reducing the errors which are possible.
+[00:07:06] So faster experimentation and
+[00:07:08] experimentation in data science is
+[00:07:10] usually related to having access to some
+[00:07:12] kind of production data. Unlike software
+[00:07:15] uh rather unlike uh non datadriven
+[00:07:18] software uh there is no you know sandbox
+[00:07:21] environment that you can just take toy
+[00:07:23] samples and know the data science will
+[00:07:25] work correctly or the models will work
+[00:07:27] correctly. You need to be able to work
+[00:07:28] with production grade data maybe the not
+[00:07:31] the entire 100% sample but maybe 10%
+[00:07:33] sample. And that means that the form
+[00:07:37] factor for that model has to be the same
+[00:07:39] as though the production uh model is
+[00:07:42] running right. So the deployment has to
+[00:07:43] be uh top-notch. So faster
+[00:07:46] experimentation and deployment is uh
+[00:07:48] that they go hand in hand and that's a
+[00:07:50] critical requirement for machine
+[00:07:51] learning. The third is automated testing
+[00:07:53] and quality control. So here unlike
+[00:07:56] software um it's not just about you know
+[00:08:00] having unit tests, having regression
+[00:08:01] tests etc. but also about the quality of
+[00:08:05] the model outputs um so that you know
+[00:08:07] that the accuracy is not tapering off or
+[00:08:10] the accuracy is not uh regressing on the
+[00:08:13] type of data that it used to do really
+[00:08:15] well at. So I'll give you an example
+[00:08:17] anecdotally here. Uh when when the GPT
+[00:08:21] class of models was first announced
+[00:08:23] especially with uh OpenAI uh announcing
+[00:08:27] that u they have got versions of it
+[00:08:29] writing code um within a year of the
+[00:08:32] first um set of those you know versions
+[00:08:35] which were made um available there was a
+[00:08:38] lot of buzz obviously a lot of
+[00:08:40] iterations newer versions were coming
+[00:08:41] up. Um at one point the newest version
+[00:08:46] of I think GPD at that time maybe it was
+[00:08:48] three if I remember right uh actually
+[00:08:52] performed worse on some coding related
+[00:08:56] benchmarks than the previous version and
+[00:08:58] nobody knew why. Um obviously OpenAI
+[00:09:01] knew but uh they were not really being
+[00:09:03] transparent about it and so the common
+[00:09:07] surmise amongst the uh community was
+[00:09:11] they no longer had um a single model
+[00:09:15] which was state-of-the-art
+[00:09:18] uh good at all the different um you know
+[00:09:21] types of benchmarks which are there like
+[00:09:22] math solving, reasoning, uh question
+[00:09:26] answering, uh coding etc. But they had
+[00:09:29] like a mixture of experts models or they
+[00:09:31] had maybe smaller grade models for
+[00:09:34] certain tasks like the coding benchmarks
+[00:09:36] which were not the uh same quality which
+[00:09:39] are which are not producing the same
+[00:09:41] quality as the previous single model
+[00:09:43] monolithic models were producing. So
+[00:09:47] that degradation in quality was
+[00:09:50] unexplained but was very visible very uh
+[00:09:53] and it was impactful as well because
+[00:09:55] suddenly there was a drop in trust
+[00:09:58] levels that people had on uh on on GBD
+[00:10:01] models. So quality control is a very
+[00:10:04] critical aspect of it and it's model
+[00:10:05] quality control we're talking about. Um
+[00:10:08] then once the model is deployed
+[00:10:10] continuously monitoring for things like
+[00:10:12] drift detection is of course very
+[00:10:13] critical. That's a MLOps guarantee that
+[00:10:15] we uh talked about earlier in the
+[00:10:17] course. Scaling and automation is also a
+[00:10:20] key facet. So notice that um the
+[00:10:24] software that gets deployed in
+[00:10:25] production is not being done by hand,
+[00:10:27] right? Somebody's actually not going
+[00:10:30] into a machine and saying okay let me
+[00:10:32] install this software. It's done via
+[00:10:35] automation. The reason being u security
+[00:10:38] becomes an issue if a human has access
+[00:10:40] to the production machines because it
+[00:10:42] has access to production data etc. So u
+[00:10:45] for privacy security reasons it's
+[00:10:47] automation that's actually deploying and
+[00:10:49] it's of automation is deploying models
+[00:10:51] in production can it not deploy multiple
+[00:10:54] copies of those models because the
+[00:10:56] inferencing uh needs to scale to the
+[00:10:59] velocity of the data and the velocity
+[00:11:01] might be high. So if it then deploys
+[00:11:04] multiple copies of the models, how many
+[00:11:06] copies to deploy? Uh if it by default
+[00:11:09] always chooses like 100 copies, then
+[00:11:11] that's a lot of wasted resources because
+[00:11:13] at times the velocity might might not
+[00:11:14] even warrant two model copies. Just one
+[00:11:17] model copy might be sufficient. So how
+[00:11:19] do you scale gracefully both up and down
+[00:11:23] and have this all be completely
+[00:11:25] automated? That's a critical benefit.
+[00:11:27] And last but not the least is security
+[00:11:29] and compliance. um to be able to have
+[00:11:33] predictable and guaranteed security is u
+[00:11:38] paramount for most enterprises all
+[00:11:41] enterprises I would say and compliance
+[00:11:43] for regulations which are different from
+[00:11:46] industry to industry geography to
+[00:11:47] geography and in most cases they're all
+[00:11:50] codifiable regulations so why not just
+[00:11:53] codify into the CICD process itself once
+[00:11:57] and have that be applicable for all
+[00:12:00] repeat occurrences of model iterations.
+[00:12:03] That's the best approach and that's
+[00:12:04] exactly what CI/CD for ML
+[00:12:08] provides. Let's take a look little
+[00:12:10] deeper. Uh when you have different data
+[00:12:13] sets uh or hyperparameters or
+[00:12:16] environments, you're going to have
+[00:12:18] completely different ways in which
+[00:12:20] models might be instantiated. So
+[00:12:23] environments here refers to the fact
+[00:12:24] that u the staging environment on which
+[00:12:27] you do test runs on pre-pro data
+[00:12:30] pre-production data might be different
+[00:12:32] from the production environment where
+[00:12:34] you don't have access as a data
+[00:12:35] scientist. So the code just runs and
+[00:12:38] then executes. So to be able to deal
+[00:12:40] with these differences in in in versions
+[00:12:43] of the data in differences in parameters
+[00:12:46] that are possible especially the
+[00:12:47] hyperparameters and differences in
+[00:12:49] environment. uh CI/CD pipelines makes
+[00:12:52] for standardizing all of this training
+[00:12:54] and deployment. So the way we put it all
+[00:12:58] together based on what we've all read so
+[00:12:59] far is you use version control for the
+[00:13:02] code itself with with GitHub uh with Git
+[00:13:05] rather and we're going to see some of
+[00:13:07] this hands-on in this week's course. Um
+[00:13:11] you deal with versions of data by either
+[00:13:14] explicitly modeling the data using uh
+[00:13:16] slowly changing dimension type two
+[00:13:18] tables. We saw this in week two. Or use
+[00:13:21] DVC for batch files, right? Or use
+[00:13:24] native features available with the data
+[00:13:25] warehousing or data source providers.
+[00:13:28] For the models itself, use git. For
+[00:13:29] features, use feast and then put it all
+[00:13:33] together with docker. Um, so we'll talk
+[00:13:36] about deployment options, especially
+[00:13:37] docker based scaling in a subsequent
+[00:13:39] week. But the solution that CI/CD
+[00:13:42] provides is the vehicle for
+[00:13:45] standardizing training and deployment by
+[00:13:47] using all of these
+[00:13:49] components. So this will ensure that a
+[00:13:52] model that's trained locally, it works
+[00:13:54] exactly the same in production. Right?
+[00:13:56] That's a very important uh
+[00:13:59] guarantee. So how do we get to faster
+[00:14:01] experimentation and deployment? So here
+[00:14:04] you've got to be able to automate model
+[00:14:06] validation. So to ensure that the model
+[00:14:08] is doing the right thing, versioning of
+[00:14:10] the models so that you're not uh dealing
+[00:14:13] with older versions and you don't have
+[00:14:15] trace on which version is running live
+[00:14:17] and the deployment aspect itself, right?
+[00:14:20] Taking one specific package and making
+[00:14:22] it available in production for a
+[00:14:23] specific inference. All of this has to
+[00:14:26] be automated for this to work together.
+[00:14:28] So this allows you to then ship newer
+[00:14:30] iterations without any manual steps. So
+[00:14:33] then it becomes completely automated end
+[00:14:35] to end. We'll see an example of the
+[00:14:38] automation for CI in this week's course
+[00:14:40] and automation for CD will come in a
+[00:14:42] subsequent
+[00:14:44] week. The third angle is automated
+[00:14:47] testing and quality control. So here
+[00:14:49] data validation is the first step. So
+[00:14:51] can I can I first have automated ways
+[00:14:54] and of testing
+[00:14:56] that data corruptions do not happen.
+[00:14:59] Right? So the data source that's getting
+[00:15:01] fed into a model gets engineered in a in
+[00:15:04] a form of predictable features and those
+[00:15:06] features are getting predictably used in
+[00:15:07] a model without further uh untraceable
+[00:15:10] operations on top of it. So that's data
+[00:15:13] validation model performance tests are
+[00:15:15] absolutely critical uh we spoke about
+[00:15:17] that and then regression tests to
+[00:15:19] prevent uh decay of performance over or
+[00:15:22] drop of performance for known samples.
+[00:15:25] So here CI/CD can you know help you
+[00:15:28] enforce rules like you know if an
+[00:15:30] autoreject a particular model if the
+[00:15:32] model accuracy goes down less than 90%.
+[00:15:35] So which means the automated pipelines
+[00:15:38] will take the model rather will build
+[00:15:40] the model first with the code that you
+[00:15:41] have produced in git and then version
+[00:15:45] that model take that model run it on the
+[00:15:47] staging data uh look at the benchmark
+[00:15:50] outputs and if it's less than a
+[00:15:52] threshold that you've specified it'll
+[00:15:53] auto autoreject which means the data
+[00:15:56] science work is not worthy enough to get
+[00:15:58] promoted to production so they'll have
+[00:16:00] to work on making it better
+[00:16:03] uh monitoring and drift detection is
+[00:16:05] critical for compliance purposes. So
+[00:16:08] there are two parts to the drift
+[00:16:10] problem. One is the data can itself
+[00:16:12] drift because the underlying data
+[00:16:15] sources and the business process that's
+[00:16:17] producing the data source has changed
+[00:16:18] over a period of time. So the
+[00:16:20] relationships between the data elements
+[00:16:22] between the features might change over a
+[00:16:24] period of time. How do you gauge that by
+[00:16:27] you know doing the appropriate
+[00:16:29] statistics or probability distributions
+[00:16:30] on top of it. The second part of it of
+[00:16:33] the drift problem is the concept drift.
+[00:16:35] The concept drift means that um the
+[00:16:38] relationship between the input variables
+[00:16:39] and the output variables they might
+[00:16:41] change over a period of time. So what
+[00:16:44] used to you know for instance be modeled
+[00:16:46] as a linear relationship no longer might
+[00:16:49] be uh linear anymore because there are
+[00:16:52] other real world factors which are
+[00:16:53] making it nonlinear. So you now have to
+[00:16:55] start using something like a logistic
+[00:16:57] regression. So concept drift also has to
+[00:17:00] be measured. So here we will use tools
+[00:17:03] like ML flow and weights and biases
+[00:17:06] those are two tools available to monitor
+[00:17:08] what's happening on a regular basis for
+[00:17:11] model executions and invocations and
+[00:17:13] then as and when we find that uh the
+[00:17:15] drifts occur the drifts themselves are
+[00:17:18] coded up using standard formula right as
+[00:17:20] and when we find that the drifts occur
+[00:17:22] then we can either resort to full
+[00:17:25] automation by have a CI/CD pipeline
+[00:17:29] automatically retrain a new model use
+[00:17:32] AutoML for doing the hyperparameter
+[00:17:34] optimization to select the final model
+[00:17:37] or at the minimum have a trigger that
+[00:17:40] goes out to the human uh to do the final
+[00:17:42] model selection. So CI/CD can help in
+[00:17:45] model retraining and then the human
+[00:17:46] verifies the output and says yeah this
+[00:17:48] is good to go and then the CD uh part of
+[00:17:51] it happens. So let's say for instance a
+[00:17:54] fraud model or a fraud detection model
+[00:17:57] uh has been created and it's been
+[00:17:59] running live successfully no problem but
+[00:18:01] it's degrading over a period of time
+[00:18:05] right so once it goes below a certain
+[00:18:07] threshold in performance um the CI/CD
+[00:18:10] pipeline automatically triggers a model
+[00:18:12] retraining in fact the CI pipeline
+[00:18:14] automatically triggers a model
+[00:18:15] retraining it also validates the
+[00:18:17] performance ensures that there is no
+[00:18:18] regression from the past and then uh It
+[00:18:22] promotes this as a challenger model in
+[00:18:24] production and all of this happens
+[00:18:27] automatically. So the final act of
+[00:18:30] taking the challenger model and saying
+[00:18:32] it's better than the champion is left to
+[00:18:34] the human because it's good to have some
+[00:18:36] human control on that. But until that
+[00:18:38] point automation takes care of
+[00:18:41] uh the
+[00:18:43] exercises. Okay. So now that we've taken
+[00:18:45] a model um and validated it, tested it
+[00:18:49] etc. We've put it into production and we
+[00:18:52] now see that um it's not scaling to the
+[00:18:55] extent that we want. The velocity of the
+[00:18:57] data that uh is required to be
+[00:19:01] inferenced is much more. So then what do
+[00:19:04] you do? uh you can first up uh rely upon
+[00:19:08] manually measuring all of those
+[00:19:10] parameters yourself and uh being woken
+[00:19:12] up in the middle of the night and to say
+[00:19:14] that hey your model is not uh scaling up
+[00:19:16] and that's blocking all the you know
+[00:19:18] shopping activity on our website like
+[00:19:20] like that's a pretty bad state of
+[00:19:22] affairs if that's happening instead the
+[00:19:25] CD part of the pipeline the continuous
+[00:19:27] deployment part of the pipeline can use
+[00:19:29] mechanisms or tools which allow for the
+[00:19:32] model to get make to be made into copies
+[00:19:35] of itself seamlessly and to also
+[00:19:39] leverage cloud infrastructure that
+[00:19:40] allows for the underlying resources to
+[00:19:42] also scale uh gracefully and as required
+[00:19:46] on demand. So this means the CD pipeline
+[00:19:50] integrated with the cloud infrastructure
+[00:19:51] like GCP can deploy models in a way that
+[00:19:54] it autoscales based on configured
+[00:19:56] thresholds like the thresholds could be
+[00:19:58] something like the model execution takes
+[00:20:01] up more than 80% of the CPU for more
+[00:20:04] than you know 30 seconds like we are
+[00:20:08] expecting every inference to last more
+[00:20:09] than I mean to to be in real time so the
+[00:20:13] inference has to be within 10 seconds
+[00:20:15] and if that's not the case if the
+[00:20:17] inference goes beyond 30 30 seconds and
+[00:20:18] the CPU is more than 80% occupied then
+[00:20:21] it's time to execute another copy of of
+[00:20:25] the model start up another copy of the
+[00:20:26] model so those could be rules that the
+[00:20:29] CI/CD pipeline operates on and then the
+[00:20:31] CD pipeline just goes and executes that
+[00:20:33] uh without concern right so that way it
+[00:20:37] scales up uh on
+[00:20:40] demand security and compliance so here u
+[00:20:45] obviously we want to be able to track
+[00:20:46] all model versions that's an audit
+[00:20:47] requirement but also who can deploy to
+[00:20:51] which environments. Um so that is also
+[00:20:54] something that needs to be restricted in
+[00:20:55] terms of access and then finally you
+[00:20:58] need to be able to say that um the
+[00:21:00] version of the model that ran at a
+[00:21:01] particular point in time bring it back
+[00:21:03] so that I want to see given the same
+[00:21:05] input that it caught at that time like 2
+[00:21:07] years ago as an example it produces the
+[00:21:10] same output that I am now seeing in the
+[00:21:13] records. So basically reproducibility
+[00:21:16] CI/CD pipeline makes it super easy to
+[00:21:18] reproduce because now we can say get me
+[00:21:21] the version of the model from 2 years
+[00:21:23] ago. How do you get that? You get that
+[00:21:24] from GitHub because that's got the code
+[00:21:26] or you get it from the model registry
+[00:21:28] where the model artifact is present and
+[00:21:30] CD deploys that into the cloud
+[00:21:32] environment and does all the packaging
+[00:21:34] for it. So you don't have to worry about
+[00:21:36] the latest pandas library being you know
+[00:21:38] misaligned etc because cd would have
+[00:21:40] already packaged for that version and
+[00:21:42] then the input data is given to it and
+[00:21:45] then the output is produced and you've
+[00:21:47] got your reproducibility uh
+[00:21:50] proven. So that's uh you know easier way
+[00:21:55] way easier to do with a fully automated
+[00:21:57] CI/CD pipeline.
+[00:22:00] So in practice then um how does CI/CD
+[00:22:03] for machine learning look like in
+[00:22:04] action? So for triggering
+[00:22:08] um what happens you know uh rather for
+[00:22:13] triggering the CI/CD pipeline itself
+[00:22:15] the stimulus would be some kind of a
+[00:22:19] code change. Okay the starting point for
+[00:22:21] all of this is one GitHub repo right
+[00:22:24] that GitHub repo tracks code. You've got
+[00:22:26] your DVC on a on a machine which tracks
+[00:22:29] the data versions for batch files. The
+[00:22:32] uh data itself residing in some kind of
+[00:22:35] backend tables for the non-file data
+[00:22:38] like basically streaming data or the uh
+[00:22:40] other types of batch data which are
+[00:22:42] tabular
+[00:22:43] um or NoSQL databases for instance. So
+[00:22:46] those are residing in their respective
+[00:22:48] versioned data control systems. And then
+[00:22:52] as and when you've got a new model
+[00:22:54] change happening or a code change
+[00:22:55] happening that will trigger certain
+[00:22:58] GitHub actions u and the way it does it
+[00:23:01] is by using what's called as a pull
+[00:23:02] request and we'll see uh live examples
+[00:23:05] of that and it triggers a GitHub action.
+[00:23:08] The GitHub action runs the CI pipeline
+[00:23:11] and the CI pipeline goes and tests a
+[00:23:13] bunch of things. What does it test? It
+[00:23:15] can't test for something it doesn't
+[00:23:16] know. Obviously, you've got to write the
+[00:23:18] tests for it. But the good part is the
+[00:23:20] tests that the previous data scientist
+[00:23:22] wrote for a model will continue to be
+[00:23:24] there as would the current test from the
+[00:23:27] latest data scientist who's working on
+[00:23:28] the problem. So the work is not throw
+[00:23:30] away. It just keeps building up over a
+[00:23:32] period of time in the same repository.
+[00:23:35] So the CI pipeline goes and tests out a
+[00:23:37] bunch of things. It validates the data,
+[00:23:39] runs the unit test, performs regression
+[00:23:40] testing. If any of these things fail,
+[00:23:43] it's going to return back with an error
+[00:23:44] saying the pull request is declined.
+[00:23:46] Right? That way the data scientist work
+[00:23:49] that um is being updated
+[00:23:53] uh will not you know corrupt the main
+[00:23:56] branch so to speak. So once the tests
+[00:23:58] are done and you can define what does
+[00:24:01] done mean then the CD part of the
+[00:24:04] pipeline takes over and then it goes and
+[00:24:06] pushes that to GCP which is what we will
+[00:24:08] see in our u in our uh this week's
+[00:24:11] contents and when it pushes to GCP it
+[00:24:14] pushes a version of that model. We're
+[00:24:16] going to start off something very simple
+[00:24:17] by looking at um uh pickle files or bin
+[00:24:22] files. But when we do the more advanced
+[00:24:26] version of model deployment serving
+[00:24:27] options using containers, these
+[00:24:30] deployment pipelines will actually
+[00:24:31] deploy containers directly and once
+[00:24:33] that's done the monitoring process will
+[00:24:35] detect like I said the drift and the
+[00:24:37] trigger trigger the retraining. So we'll
+[00:24:39] see an example of that as
+[00:24:40] well. So in summary u CI/CD
+[00:24:44] ensures consistent reliable scalable
+[00:24:48] machine learning
+[00:24:49] deployment. The same was actually
+[00:24:51] applicable for software as well. So
+[00:24:53] machine learning based um applications
+[00:24:57] are also a software at the end of the
+[00:24:58] day and a lot more common uh I mean they
+[00:25:03] have a lot more in common together than
+[00:25:05] otherwise obviously machine learning is
+[00:25:07] slightly more involved because it's got
+[00:25:09] the models as well as artifacts but
+[00:25:11] nevertheless the principles remain the
+[00:25:13] same consistent reliable scalable
+[00:25:15] deployments is what CI/CD can do for ML
+[00:25:18] automating testing monitoring and
+[00:25:20] retraining so these are critical steps
+[00:25:23] which are required to be done in the
+[00:25:25] evolution of machine learning models and
+[00:25:27] then helps the model stay up to date and
+[00:25:29] high performing so that you're not u
+[00:25:32] called to action every time something
+[00:25:33] degrades over a period of time. And the
+[00:25:36] crucial insight here
+[00:25:39] is machine learning is not a once and
+[00:25:42] done kind of an activity. It's always
+[00:25:45] going to require
+[00:25:47] iterations. If not from
+[00:25:49] you, it could be from the next data
+[00:25:52] scientist working on the problem. You
+[00:25:54] could get a promotion, you could become
+[00:25:55] a manager, you could move on to other
+[00:25:56] companies, somebody else is going to
+[00:25:58] come and work on the same problem on the
+[00:25:59] same code base even and build
+[00:26:01] incrementally better features, better
+[00:26:03] versions of the code. Uh, which means
+[00:26:06] the company needs to have that benefit
+[00:26:09] of history while not throwing away all
+[00:26:13] that accumulated experience.
+[00:26:16] So uh with that we will uh start getting
+[00:26:19] into the actions of how CI/CD can be
+[00:26:23] realized using something like
+[00:26:24] GitHub. I'll see you then in the next
+[00:26:27] video.
+[00:26:28] [Music]
